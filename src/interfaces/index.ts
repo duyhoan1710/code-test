@@ -1,8 +1,7 @@
-import { EQuestionType } from "./../enums/index";
-
 export interface IQuestion {
-  questionType: EQuestionType;
+  questionType: string;
   question: string;
   answers: string[];
   correctAnswers: string[];
+  selectedAnswers?: string[]
 }

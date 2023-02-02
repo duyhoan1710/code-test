@@ -14,6 +14,15 @@ export const HomePage = styled(Grid)`
     }
   }
 
+  .bold {
+    font-weight: 500;
+  }
+
+  .text-answer {
+    color: blue;
+    font-weight: 500;
+  }
+
   .question {
     border-right: 1px solid #000;
 
@@ -64,5 +73,57 @@ export const HomePage = styled(Grid)`
   }
 
   .answer {
+    .item-question {
+      margin-bottom: 30px;
+
+      .question-title {
+        margin-bottom: 10px;
+      }
+      .single-question-answers {
+        display: flex;
+        width: 100%;
+
+        .item-answer {
+          width: 25%;
+          max-width: 25%;
+        }
+
+        .selected-answer {
+          border: 2px solid blue;
+          padding: 10px;
+          border-radius: 50%;
+        }
+      }
+
+      .multiple-question-answers {
+        .item-answer {
+          border: 2px solid blue;
+          padding: 6px 8px;
+          margin-bottom: 6px;
+          border-radius: 6px;
+        }
+
+        .selected-answer {
+          background-color: #005aff24;
+        }
+      }
+
+      .fill-question-answer {
+        border: 1px solid blue;
+        padding: 20px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+
+        .fill-input {
+          margin: 0 10px;
+          margin-top: 6px;
+
+          input {
+            color: blue;
+          }
+        }
+      }
+    }
   }
 `;
