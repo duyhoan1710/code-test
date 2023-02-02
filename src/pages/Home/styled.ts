@@ -23,6 +23,18 @@ export const HomePage = styled(Grid)`
     font-weight: 500;
   }
 
+  .drag-box {
+    height: 65px;
+    background-color: #0000ff30;
+    width: 65px;
+    border-radius: 10px;
+    border: 1px solid #0059ff4f;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .question {
     border-right: 1px solid #000;
 
@@ -122,6 +134,13 @@ export const HomePage = styled(Grid)`
           input {
             color: blue;
           }
+        }
+      }
+
+      .drag-answer {
+        .source,
+        .destination {
+          margin: 40px 0;
         }
       }
     }

@@ -53,11 +53,7 @@ export const Home = () => {
   }
 
   function addMoreCorrectAnswer() {
-    console.log(1, disableBtnAddMoreCorrectAnswer, questionType);
-
     if (disableBtnAddMoreCorrectAnswer) return;
-
-    console.log(2, disableBtnAddMoreCorrectAnswer, questionType);
 
     const random = randomString(6);
 
@@ -70,11 +66,23 @@ export const Home = () => {
   }
 
   const onSubmit = () => {
+    const source: { [x: string]: string } = {};
+    const destination: { [x: string]: string } = {};
+
+    if (questionType === EQuestionType.Drag) {
+      Object.values(listAnswers).forEach((value, index) => {
+        source[`source_${index}`] = value;
+        destination[`destination_${index}`] = "";
+      });
+    }
+
     const newQuestion = {
       questionType,
       question,
       answers: Object.values(listAnswers),
       correctAnswers: Object.values(listCorrectAnswers),
+      source,
+      destination,
     };
 
     setListQuestions((questions) => [...questions, newQuestion]);
@@ -140,8 +148,33 @@ export const Home = () => {
     setListQuestions(newListQuestions);
   };
 
-  const onDragEnd = () => {
-    // the only one that is required
+  const onDragEnd = ({ destination, source, questionIndex }: any) => {
+    const newListQuestions = JSON.parse(JSON.stringify(listQuestions));
+
+    const sourceDropId = source.droppableId.split("_")[0];
+
+    const destinationDropId = destination.droppableId.split("_")[0];
+
+    if (sourceDropId === "source" && destinationDropId === "destination") {
+      const tempData =
+        newListQuestions[questionIndex].destination[destination.droppableId];
+
+      newListQuestions[questionIndex].destination[destination.droppableId] =
+        newListQuestions[questionIndex].source[source.droppableId];
+      newListQuestions[questionIndex].source[source.droppableId] = tempData;
+    }
+
+    if (sourceDropId === "destination" && destinationDropId === "source") {
+      const tempData =
+        newListQuestions[questionIndex].source[destination.droppableId];
+
+      newListQuestions[questionIndex].source[destination.droppableId] =
+        newListQuestions[questionIndex].destination[source.droppableId];
+      newListQuestions[questionIndex].destination[source.droppableId] =
+        tempData;
+    }
+
+    setListQuestions(newListQuestions);
   };
 
   useEffect(() => {
@@ -408,40 +441,91 @@ export const Home = () => {
                   <span className="bold">{questionIndex + 1}</span>: Drag or
                   Select text to complete this sentence
                 </div>
+
                 <div className="drag-answer">
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Grid container spacing={2}>
-                      {question.answers.map((answer, index) => (
-                        <Grid item xs={Math.round(12 / question.answers.length)}>
-                          <Droppable droppableId={index.toString()}>
-                            {(provided: any, snapshot: any) => (
-                              <div
-                                ref={provided.innerRef}
-                                style={{
-                                  backgroundColor: snapshot.isDragging
-                                    ? "green"
-                                    : "lightblue",
-                                }}
-                                {...provided.droppableProps}
-                              >
-                                <Draggable draggableId={answer} index={index}>
-                                  {(provided, snapshot) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
+                  <DragDropContext
+                    onDragEnd={(data) => onDragEnd({ ...data, questionIndex })}
+                  >
+                    <div className="source">
+                      <Grid container spacing={2}>
+                        {Object.values(question.source).map((answer, index) => (
+                          <Grid item key={`source_${index}`}>
+                            <Droppable droppableId={`source_${index}`}>
+                              {(provided, snapshot: any) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  style={{
+                                    backgroundColor:
+                                      snapshot.isDragging && "green",
+                                  }}
+                                  className="drag-box"
+                                  {...provided.droppableProps}
+                                >
+                                  <Draggable
+                                    draggableId={`source_${index}`}
+                                    index={0}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className="drag-box"
+                                      >
+                                        {answer}
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                  {provided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </div>
+
+                    <div className="destination">
+                      <Grid container spacing={2}>
+                        {Object.values(question.destination).map(
+                          (answer, index) => (
+                            <Grid item key={`destination_${index}`}>
+                              <Droppable droppableId={`destination_${index}`}>
+                                {(provided, snapshot: any) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    style={{
+                                      backgroundColor: snapshot.isDragging
+                                        ? "green"
+                                        : "lightblue",
+                                    }}
+                                    className="drag-box"
+                                    {...provided.droppableProps}
+                                  >
+                                    <Draggable
+                                      draggableId={`destination_${index}`}
+                                      index={0}
                                     >
-                                      {answer}
-                                    </div>
-                                  )}
-                                </Draggable>
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-                        </Grid>
-                      ))}
-                    </Grid>
+                                      {(provided, snapshot) => (
+                                        <div
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          className="drag-box"
+                                        >
+                                          {answer}
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            </Grid>
+                          )
+                        )}
+                      </Grid>
+                    </div>
                   </DragDropContext>
                 </div>
               </>

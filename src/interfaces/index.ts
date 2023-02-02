@@ -3,5 +3,7 @@ export interface IQuestion {
   question: string;
   answers: string[];
   correctAnswers: string[];
-  selectedAnswers?: string[]
+  selectedAnswers?: string[];
+  source: { [x: string]: string };
+  destination: { [x: string]: string };
 }
