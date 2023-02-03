@@ -33,12 +33,10 @@ export const Home = () => {
   const [listCorrectAnswers, setListCorrectAnswers] = useState<{
     [x: string]: string;
   }>({});
+  const [checkAnswer, setCheckAnswer] = useState(false);
 
   const disableBtnAddMoreCorrectAnswer = useMemo(() => {
-    if (
-      questionType === EQuestionType.SingleChoose ||
-      questionType === EQuestionType.Fill
-    ) {
+    if (questionType === EQuestionType.SingleChoose) {
       if (Object.keys(listCorrectAnswers).length >= 1) return true;
     }
 
@@ -121,6 +119,9 @@ export const Home = () => {
   const onSelectMultipleAnswer = (index: number, answer: string) => {
     const newListQuestions = JSON.parse(JSON.stringify(listQuestions));
 
+    if (!newListQuestions[index]?.selectedAnswers)
+      newListQuestions[index].selectedAnswers = [];
+
     const findAnswerIndex =
       newListQuestions[index]?.selectedAnswers?.indexOf(answer);
 
@@ -185,6 +186,14 @@ export const Home = () => {
   useEffect(() => {
     onClearForm();
   }, [questionType]);
+
+  useEffect(() => {
+    if (checkAnswer) {
+      setTimeout(() => {
+        setCheckAnswer(false);
+      }, 3000);
+    }
+  }, [checkAnswer])
 
   return (
     <HomePage container spacing={2}>
@@ -266,62 +275,43 @@ export const Home = () => {
           <div className="input-wrap">
             <label className="label">Correct Answer</label>
 
-            {questionType === EQuestionType.Fill &&
-              Object.keys(listCorrectAnswers).map((key) => (
-                <TextareaAutosize
-                  key={key}
-                  minRows={6}
-                  className="input"
-                  name={key}
-                  value={listCorrectAnswers[key]}
-                  onChange={(e) => {
-                    setListCorrectAnswers((listCorrectAnswers) => ({
-                      ...listCorrectAnswers,
-                      [key]: e.target.value,
-                    }));
-                  }}
-                />
-              ))}
-
-            {questionType !== EQuestionType.Fill && (
+            <div>
               <div>
-                <div>
-                  {Object.keys(listCorrectAnswers).map((key) => (
-                    <div key={key} className="answer-item">
-                      <TextField
-                        variant="outlined"
-                        size="small"
-                        name={key}
-                        value={listCorrectAnswers[key]}
-                        onChange={(e) => {
-                          setListCorrectAnswers((listCorrectAnswers) => ({
-                            ...listCorrectAnswers,
-                            [key]: e.target.value,
-                          }));
-                        }}
-                      />
+                {Object.keys(listCorrectAnswers).map((key) => (
+                  <div key={key} className="answer-item">
+                    <TextField
+                      variant="outlined"
+                      size="small"
+                      name={key}
+                      value={listCorrectAnswers[key]}
+                      onChange={(e) => {
+                        setListCorrectAnswers((listCorrectAnswers) => ({
+                          ...listCorrectAnswers,
+                          [key]: e.target.value,
+                        }));
+                      }}
+                    />
 
-                      <Button
-                        color="error"
-                        variant="outlined"
-                        className="btn-remove"
-                      >
-                        remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-
-                <Button
-                  className="btn-add"
-                  variant="outlined"
-                  disabled={disableBtnAddMoreCorrectAnswer}
-                  onClick={addMoreCorrectAnswer}
-                >
-                  Add More
-                </Button>
+                    <Button
+                      color="error"
+                      variant="outlined"
+                      className="btn-remove"
+                    >
+                      remove
+                    </Button>
+                  </div>
+                ))}
               </div>
-            )}
+
+              <Button
+                className="btn-add"
+                variant="outlined"
+                disabled={disableBtnAddMoreCorrectAnswer}
+                onClick={addMoreCorrectAnswer}
+              >
+                Add More
+              </Button>
+            </div>
           </div>
 
           <div className="btn-submit">
@@ -361,7 +351,17 @@ export const Home = () => {
                           question.selectedAnswers &&
                           answer === question.selectedAnswers[0] &&
                           "selected-answer"
-                        }`}
+                        } ${
+                          checkAnswer &&
+                          question.correctAnswers.indexOf(answer) > -1 &&
+                          "correct-answer"
+                        } ${
+                          checkAnswer &&
+                          question.selectedAnswers &&
+                          answer === question.selectedAnswers[0] &&
+                          question.correctAnswers.indexOf(answer) === -1 &&
+                          "wrong-answer"
+                        } `}
                       >
                         {convertNumberToAlphabet[index + 1]}
                       </span>
@@ -390,6 +390,16 @@ export const Home = () => {
                         question.selectedAnswers &&
                         question.selectedAnswers.indexOf(answer) > -1 &&
                         "selected-answer"
+                      } ${
+                        checkAnswer &&
+                        question.correctAnswers.indexOf(answer) > -1 &&
+                        "correct-answer"
+                      } ${
+                        checkAnswer &&
+                        question.selectedAnswers &&
+                        question.selectedAnswers.indexOf(answer) > -1 &&
+                        question.correctAnswers.indexOf(answer) === -1 &&
+                        "wrong-answer"
                       }`}
                       onClick={() =>
                         onSelectMultipleAnswer(questionIndex, answer)
@@ -419,7 +429,19 @@ export const Home = () => {
                           <TextField
                             variant="standard"
                             size="small"
-                            className="fill-input"
+                            className={`fill-input ${
+                              checkAnswer &&
+                              question?.selectedAnswers &&
+                              question.correctAnswers[index] ===
+                                question?.selectedAnswers[index] &&
+                              "fill-correct-answer"
+                            } ${
+                              checkAnswer &&
+                              question.selectedAnswers &&
+                              question.correctAnswers[index] !==
+                                question.selectedAnswers[index] &&
+                              "fill-wrong-answer"
+                            }`}
                             onChange={(e) =>
                               onFillTextAnswer(
                                 questionIndex,
@@ -511,7 +533,21 @@ export const Home = () => {
                                           ref={provided.innerRef}
                                           {...provided.draggableProps}
                                           {...provided.dragHandleProps}
-                                          className="drag-box"
+                                          className={`drag-box ${
+                                            checkAnswer &&
+                                            question.destination[
+                                              `destination_${index}`
+                                            ] ===
+                                              question.correctAnswers[index] &&
+                                            "drag-correct-answer"
+                                          } ${
+                                            checkAnswer &&
+                                            question.destination[
+                                              `destination_${index}`
+                                            ] !==
+                                              question.correctAnswers[index] &&
+                                            "drag-wrong-answer"
+                                          }`}
                                         >
                                           {answer}
                                         </div>
@@ -532,6 +568,15 @@ export const Home = () => {
             )}
           </div>
         ))}
+
+        <div className="btn-check-answer">
+          <Button
+            variant="outlined"
+            onClick={() => setCheckAnswer(true)}
+          >
+            Check Answer
+          </Button>
+        </div>
       </Grid>
     </HomePage>
   );

@@ -105,11 +105,37 @@ export const HomePage = styled(Grid)`
           padding: 10px;
           border-radius: 50%;
         }
+
+        .correct-answer {
+          border: 2px solid green !important;
+          padding: 10px;
+          border-radius: 50%;
+        }
+
+        .wrong-answer {
+          border: 2px solid red !important;
+          padding: 10px;
+          border-radius: 50%;
+        }
       }
 
       .multiple-question-answers {
         .item-answer {
           border: 2px solid blue;
+          padding: 6px 8px;
+          margin-bottom: 6px;
+          border-radius: 6px;
+        }
+
+        .correct-answer {
+          border: 2px solid green !important;
+          padding: 6px 8px;
+          margin-bottom: 6px;
+          border-radius: 6px;
+        }
+
+        .wrong-answer {
+          border: 2px solid red !important;
           padding: 6px 8px;
           margin-bottom: 6px;
           border-radius: 6px;
@@ -135,6 +161,24 @@ export const HomePage = styled(Grid)`
             color: blue;
           }
         }
+
+        .fill-correct-answer {
+          margin: 0 10px;
+          margin-top: 6px;
+
+          input {
+            color: green;
+          }
+        }
+
+        .fill-wrong-answer {
+          margin: 0 10px;
+          margin-top: 6px;
+
+          input {
+            color: red;
+          }
+        }
       }
 
       .drag-answer {
@@ -143,6 +187,21 @@ export const HomePage = styled(Grid)`
           margin: 40px 0;
         }
       }
+
+      .drag-correct-answer {
+        border: 2px solid green !important;
+        color: green;
+      }
+
+      .drag-wrong-answer {
+        border: 2px solid red !important;
+        color: red;
+      }
+    }
+
+    .btn-check-answer {
+      display: flex;
+      justify-content: end;
     }
   }
 `;
