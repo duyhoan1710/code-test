@@ -86,8 +86,6 @@ export const Home = () => {
     setListQuestions((questions) => [...questions, newQuestion]);
   };
 
-  console.log(listQuestions);
-
   const onClearForm = () => {
     setQuestion("");
 
@@ -193,7 +191,7 @@ export const Home = () => {
         setCheckAnswer(false);
       }, 3000);
     }
-  }, [checkAnswer])
+  }, [checkAnswer]);
 
   return (
     <HomePage container spacing={2}>
@@ -255,6 +253,12 @@ export const Home = () => {
                       color="error"
                       variant="outlined"
                       className="btn-remove"
+                      onClick={() => {
+                        const newListAnswers = { ...listAnswers };
+                        delete newListAnswers[key];
+
+                        setListAnswers(newListAnswers);
+                      }}
                     >
                       remove
                     </Button>
@@ -296,6 +300,12 @@ export const Home = () => {
                       color="error"
                       variant="outlined"
                       className="btn-remove"
+                      onClick={() => {
+                        const newListCorrectAnswers = { ...listCorrectAnswers };
+                        delete newListCorrectAnswers[key];
+
+                        setListCorrectAnswers(newListCorrectAnswers);
+                      }}
                     >
                       remove
                     </Button>
@@ -570,10 +580,7 @@ export const Home = () => {
         ))}
 
         <div className="btn-check-answer">
-          <Button
-            variant="outlined"
-            onClick={() => setCheckAnswer(true)}
-          >
+          <Button variant="outlined" onClick={() => setCheckAnswer(true)}>
             Check Answer
           </Button>
         </div>
